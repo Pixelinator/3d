@@ -16,13 +16,8 @@ export class World {
   public entityManager: EntityManager;
   public inputManager: InputManager;
   public resourceManager: ResourceManager;
-
-  // public composer: any;
   public stats: Stats;
   public gui: GUI;
-  // public params: any;
-  // public sky: Sky;
-  // public parallelPairs: any[];
   public clock: THREE.Clock;
   public gameTime: GameTime;
   public renderDelta: number;
@@ -30,7 +25,7 @@ export class World {
   public requestDelta: number;
   public sinceLastFrame: number;
   public justRendered: boolean;
-  public timeScaleTarget: number = 1;
+  public timeScaleTarget = 1;
 
   // public cameraOperator: CameraOperator;
   // public console: InfoStack;
@@ -42,11 +37,13 @@ export class World {
   private lastScenarioID: string;
 
   constructor() {
-    this.gameTime = new GameTime();
-    this.graphicsWorld = new GraphicsWorld();
-    this.physicsWorld = new PhysicsWorld();
     this.inputManager = new InputManager(window);
     this.resourceManager = new ResourceManager();
+    this.resourceManager.loadResource("ybot", "/models/ybot.fbx");
+    this.gameTime = new GameTime();
+    this.clock = new THREE.Clock();
+    this.graphicsWorld = new GraphicsWorld(this);
+    this.physicsWorld = new PhysicsWorld(this);
     this.stats = Stats();
     this.gui = new GUI();
     const timeFolder = this.gui.addFolder("Time");
@@ -63,8 +60,9 @@ export class World {
   }
 
   update() {
-    this.gameTime.update();
-    this.physicsWorld.update();
+    let deltaTime = this.clock.getDelta();
+    this.gameTime.update(deltaTime);
+    this.physicsWorld.update(deltaTime);
     this.graphicsWorld.update(this.gameTime);
     this.stats.update();
     requestAnimationFrame(this.update.bind(this));

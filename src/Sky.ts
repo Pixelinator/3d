@@ -199,8 +199,8 @@ export class Sky extends THREE.Object3D {
   public _theta: number; // Sun Rotation
   private hemiLight: THREE.HemisphereLight;
   private pointLight: THREE.PointLight;
-  private maxHemiIntensity: number = 0.9;
-  private minHemiIntensity: number = 0.3;
+  private maxHemiIntensity = 0.9;
+  private minHemiIntensity = 0.3;
   private world: World;
   public helper: any;
 
@@ -219,7 +219,7 @@ export class Sky extends THREE.Object3D {
 
     // Mesh
     this.skyMesh = new THREE.Mesh(
-      new THREE.SphereBufferGeometry(1000, 24, 12),
+      new THREE.SphereBufferGeometry(35000, 48, 24),
       this.skyMaterial
     );
     this.attach(this.skyMesh);
@@ -245,8 +245,8 @@ export class Sky extends THREE.Object3D {
     this.pointLight.shadow.camera.far = 500; // default
 
     this.world.graphicsWorld.graphicsWorld.add(this.hemiLight);
-    this.helper = new THREE.HemisphereLightHelper(this.hemiLight, 5);
-    this.world.graphicsWorld.graphicsWorld.add(this.helper);
+    // this.helper = new THREE.HemisphereLightHelper(this.hemiLight, 5);
+    // this.world.graphicsWorld.graphicsWorld.add(this.helper);
 
     this.refreshSunPosition();
 
@@ -283,7 +283,7 @@ export class Sky extends THREE.Object3D {
   update(gameTime: GameTime) {
     this.position.copy(this.world.graphicsWorld.camera.position);
     this.refreshSunPosition();
-    this.helper.update();
+    // this.helper.update();
   }
 }
 

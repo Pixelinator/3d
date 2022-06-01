@@ -11,6 +11,8 @@
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["node_modules/ammojs-typed/ammo/ambient"],
     "paths": {
       "*": ["node_modules/*"]
     }
