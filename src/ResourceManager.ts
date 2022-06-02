@@ -37,6 +37,43 @@ export class ResourceManager {
     return;
   }
 
+  loadTexture(url: string) {
+    return new Promise((resolve) => {
+      new THREE.TextureLoader().load(url, resolve);
+    });
+  }
+
+  loadMaterial(
+    mapUrl: string,
+    normalUrl?: string,
+    displacementUrl?: string,
+    aoUrl?: string
+  ) {
+    const textures: any = {
+      map: mapUrl,
+      normalMap: normalUrl,
+      displacementMap: displacementUrl,
+      aoMap: aoUrl,
+    };
+
+    const params: any = {
+      normalScale: new THREE.Vector2(1, 1),
+      displacementScale: 0.1,
+      displacementBias: -0.05,
+      aoMapIntensity: 1,
+    };
+
+    const promises = Object.keys(textures).map((key) => {
+      return this.loadTexture(textures[key]).then((texture) => {
+        params[key] = texture;
+      });
+    });
+
+    return Promise.all(promises).then(() => {
+      return new THREE.MeshStandardMaterial(params);
+    });
+  }
+
   addResource(name: string, resource: any) {
     this.resources.set(name, resource);
   }

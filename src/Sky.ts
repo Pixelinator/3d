@@ -197,6 +197,7 @@ export class Sky extends THREE.Object3D {
   private skyMesh: THREE.Mesh;
   public _phi: number; // Sun Elevation
   public _theta: number; // Sun Rotation
+  public points: THREE.Vector[];
   private hemiLight: THREE.HemisphereLight;
   private pointLight: THREE.PointLight;
   private maxHemiIntensity = 0.9;
@@ -210,6 +211,22 @@ export class Sky extends THREE.Object3D {
     this._phi = 90;
     this._theta = 0;
 
+    /**
+     * 05:00 - phi0 theta90 - at east
+     * 12:00 - phi90 theta0 - at north
+     * 12:01 - phi90 theta360 - at north
+     * 19:00 - phi270 theta180 - at west
+     */
+    const curve = new THREE.CatmullRomCurve3([
+      // gameTime in sec, phi, theta
+      new THREE.Vector3(18000, 0, 90),
+      new THREE.Vector3(43200, 90, 0),
+      new THREE.Vector3(68400, 270, 180),
+      new THREE.Vector3(17999, 360, 90),
+    ]);
+    this.points = curve.getPoints(99);
+    // console.log(this.points);
+
     this.skyMaterial = new THREE.ShaderMaterial({
       uniforms: THREE.UniformsUtils.clone(SkyShader.uniforms),
       fragmentShader: SkyShader.fragmentShader,
@@ -219,7 +236,7 @@ export class Sky extends THREE.Object3D {
 
     // Mesh
     this.skyMesh = new THREE.Mesh(
-      new THREE.SphereBufferGeometry(1000, 48, 24),
+      new THREE.SphereBufferGeometry(35000, 48, 24),
       this.skyMaterial
     );
     this.attach(this.skyMesh);
@@ -278,18 +295,12 @@ export class Sky extends THREE.Object3D {
     this.pointLight.intensity = this.hemiLight.intensity * 3;
   }
 
-  update(gameTime: GameTime) {
+  update(deltaTime: number, gameTime: GameTime) {
     this.position.copy(this.world.graphicsWorld.camera.position);
     this.refreshSunPosition();
     this.refreshHemiIntensity();
   }
 }
-
-/**
- * 05:00 - phi0 theta90 - at east
- * 12:00 - phi90 theta0 - at north
- * 19:00 - phi270 theta180 - at west
- */
 
 function clamp(val: number, min: number, max: number) {
   return val > max ? max : val < min ? min : val;

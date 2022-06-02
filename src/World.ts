@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { ResourceManager } from "./ResourceManager";
 import { InputManager } from "./InputManager";
+import { Entity } from "./Entity";
 import { EntityManager } from "./EntityManager";
+import { ThirdPersonCamera } from "./ThirdPersonCamera";
 import { ScenarioManager } from "./ScenarioManager";
 import { PhysicsWorld } from "./PhysicsWorld";
 import { GraphicsWorld } from "./GraphicsWorld";
@@ -28,14 +30,6 @@ export class World {
   public justRendered: boolean;
   public timeScaleTarget = 1;
   public mat: THREE.MeshStandardMaterial;
-
-  // public cameraOperator: CameraOperator;
-  // public console: InfoStack;
-  // public cannonDebugRenderer: CannonDebugRenderer;
-  // public characters: Character[] = [];
-  // public vehicles: Vehicle[] = [];
-  // public paths: Path[] = [];
-  // public updatables: IUpdatable[] = [];
   private lastScenarioID: string;
 
   constructor() {
@@ -46,34 +40,33 @@ export class World {
         "sundial",
         "/models/Sundial_Classic_big.stl"
       ),
-      this.resourceManager.loadResource(
-        "forestAlbedo",
-        "/textures/pbr/forest-1K/1K-forest_albedo.jpg"
+      this.resourceManager.loadMaterial(
+        "/textures/pbr/forest-4K/4K-forest_albedo.jpg",
+        "/textures/pbr/forest-4K/4K-forest_normal.jpg",
+        "/textures/pbr/forest-4K/4K-forest_height.jpg",
+        "/textures/pbr/forest-4K/4K-forest_ao.jpg"
       ),
-      this.resourceManager.loadResource(
-        "forestAO",
-        "/textures/pbr/forest-1K/1K-forest_ao.jpg"
-      ),
-      this.resourceManager.loadResource(
-        "forestHeight",
-        "/textures/pbr/forest-1K/1K-forest_height.jpg"
-      ),
-      this.resourceManager.loadResource(
-        "forestNormal",
-        "/textures/pbr/forest-1K/1K-forest_normal.jpg"
-      ),
+      // this.resourceManager.loadMaterial(
+      //   "/textures/pbr/forest-1K/1K-forest_albedo.jpg",
+      //   "/textures/pbr/forest-1K/1K-forest_normal.jpg",
+      //   "/textures/pbr/forest-1K/1K-forest_height.jpg",
+      //   "/textures/pbr/forest-1K/1K-forest_ao.jpg"
+      // ),
     ])
-      .then(() => {
-        console.log(this);
+      .then((result) => {
+        this.mat = result[2] as THREE.MeshStandardMaterial;
+        console.log(this.mat);
 
         this.gameTime = new GameTime();
         this.clock = new THREE.Clock();
+        this.entityManager = new EntityManager();
         this.inputManager = new InputManager(window);
         this.graphicsWorld = new GraphicsWorld(this);
         this.graphicsWorld.sky = new Sky(this);
         this.physicsWorld = new PhysicsWorld(this);
         this.stats = Stats();
         this.gui = new GUI();
+
         const timeFolder = this.gui.addFolder("Time");
         timeFolder.add(this.gameTime, "gameTimeHour", 0, 24).listen();
         timeFolder.add(this.gameTime, "gameTimeMinute", 0, 59).listen();
@@ -83,23 +76,28 @@ export class World {
         skyFolder.add(this.graphicsWorld.sky, "_phi", 0, 360).listen();
         skyFolder.add(this.graphicsWorld.sky, "_theta", 0, 360).listen();
         skyFolder.open();
+
+        const player = new Entity();
+        player.position.set(0, 0, 0);
+        this.entityManager.add(player, "player");
+        const camera = new Entity();
+        camera.addComponent(
+          new ThirdPersonCamera(
+            this.graphicsWorld.camera,
+            this.entityManager.get("player")
+          )
+        );
+
+        this.entityManager.add(camera, "player-camera");
+        console.log(this.entityManager);
+
         document.body.appendChild(this.stats.dom);
         window.addEventListener("resize", this.resize.bind(this), false);
 
-        this.mat = new THREE.MeshStandardMaterial({
-          map: this.resourceManager.getResource("forestAlbedo"),
-          normalMap: this.resourceManager.getResource("forestNormal"),
-          normalScale: new THREE.Vector2(1, 1),
-          displacementMap: this.resourceManager.getResource("forestHeight"),
-          displacementScale: 0.1,
-          displacementBias: -0.05,
-          aoMap: this.resourceManager.getResource("forestAO"),
-          aoMapIntensity: 1,
-        });
-
         this.update();
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.error(err);
         console.log("Oh no, epic failure!");
       });
   }
@@ -109,10 +107,11 @@ export class World {
   }
 
   update() {
-    let deltaTime = this.clock.getDelta();
+    const deltaTime = this.clock.getDelta();
     this.gameTime.update(deltaTime);
+    this.entityManager.update(deltaTime);
     this.physicsWorld.update(deltaTime);
-    this.graphicsWorld.update(this.gameTime);
+    this.graphicsWorld.update(deltaTime, this.gameTime);
     this.stats.update();
     requestAnimationFrame(this.update.bind(this));
   }

@@ -4,7 +4,6 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Sky } from "./Sky";
 import { GameTime } from "./GameTime";
 import CharacterSystem from "./CharacterSystem";
@@ -36,7 +35,7 @@ export class GraphicsWorld {
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    // this.renderer.physicallyCorrectLights = true;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.camera = new THREE.PerspectiveCamera(
       45,
       innerWidth / innerHeight,
@@ -60,12 +59,6 @@ export class GraphicsWorld {
     this.renderer.domElement.id = "canvas";
 
     // This should be inside a scenario
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.camera.position.y = 15;
-    this.camera.position.z = 50;
-    this.camera.lookAt(0, 0, 0);
-    this.controls.update();
-    // this.init();
     // Nebula.fromJSONAsync(json, THREE).then((loaded: any) => {
     //   console.log(loaded);
     //   const nebulaRenderer = new SpriteRenderer(this.graphicsWorld, THREE);
@@ -102,16 +95,9 @@ export class GraphicsWorld {
     });
   }
 
-  init() {
-    // this.sky = new Sky(world);
-  }
-
-  update(gameTime: GameTime) {
-    this.controls.update();
-    // this.cube.rotation.x += 0.001;
-    // this.cube.rotation.y += 0.002;
+  update(deltaTime: number, gameTime: GameTime) {
     // this.nebula.update();
-    this.sky.update(gameTime);
+    this.sky.update(deltaTime, gameTime);
     this.render();
   }
 

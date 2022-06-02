@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { FiniteStateMachine } from "./FiniteStateMachine";
 import { InputManager } from "./InputManager";
-import { System } from "./System";
+import { Component } from "./Component";
 
-export default class CharacterSystem extends System {
+export default class CharacterSystem extends Component {
   private camera: THREE.Camera;
   private scene: THREE.Scene;
   private decceleration: THREE.Vector3;
@@ -22,5 +22,9 @@ export default class CharacterSystem extends System {
     this.input = inputManager;
 
     this.stateMachine = new FiniteStateMachine();
+  }
+
+  update(timeElapsed: number) {
+    super.update(timeElapsed);
   }
 }

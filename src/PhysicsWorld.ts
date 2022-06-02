@@ -45,11 +45,19 @@ export class PhysicsWorld {
 
     // temp code
     const ground = new THREE.Mesh(
-      new THREE.BoxGeometry(100, 1, 100),
-      new THREE.MeshStandardMaterial({ color: 0x404040 })
+      new THREE.BoxGeometry(100, 1, 100, 200, 200),
+      this.parent.mat
+      // new THREE.MeshStandardMaterial({ color: 0x404040 })
     );
+    ground.material.map.wrapS = THREE.RepeatWrapping;
+    ground.material.map.wrapT = THREE.RepeatWrapping;
+    ground.material.map.repeat.set(20, 20);
     ground.castShadow = false;
     ground.receiveShadow = true;
+    ground.geometry.setAttribute(
+      "uv2",
+      new THREE.BufferAttribute(ground.geometry.attributes.uv.array, 2)
+    );
     this.parent.graphicsWorld.graphicsWorld.add(ground);
 
     const rbGround = new RigidBody(this.Ammo);

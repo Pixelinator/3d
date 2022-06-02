@@ -13,12 +13,13 @@ export class GameTime {
     this.gameTimeHour = hour | 12;
     this.gameTimeMinute = minute | 0;
     this.gameTimeSecond = second | 0;
-    this.timescale = timescale | 5;
+    this.timescale = timescale | 1;
   }
 
   update(timeElapsed: number) {
     this.gameTimeSecond += timeElapsed * this.timescale;
 
+    // the following code is buggy as hell
     if (this.gameTimeSecond > 59) {
       this.gameTimeSecond = 0;
       this.gameTimeMinute++;
@@ -36,7 +37,7 @@ export class GameTime {
 
   timeToSeconds(): number {
     return (
-      this.gameTimeHour * 60 * 60 +
+      this.gameTimeHour * (60 * 60) +
       this.gameTimeMinute * 60 +
       this.gameTimeSecond
     );
