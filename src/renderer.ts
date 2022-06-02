@@ -27,8 +27,6 @@
  */
 
 import "./index.css";
-
-import { Sky } from "./Sky";
 import { World } from "./World";
 
 /**
@@ -36,10 +34,3 @@ import { World } from "./World";
  */
 
 const world = new World();
-world.graphicsWorld.sky = new Sky(world);
-// console.log(world.graphicsWorld.sky);
-const skyFolder = world.gui.addFolder("Sky");
-skyFolder.add(world.graphicsWorld.sky, "_phi", 0, 360).listen();
-skyFolder.add(world.graphicsWorld.sky, "_theta", 0, 360).listen();
-skyFolder.open();
-world.update();

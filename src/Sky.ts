@@ -219,42 +219,39 @@ export class Sky extends THREE.Object3D {
 
     // Mesh
     this.skyMesh = new THREE.Mesh(
-      new THREE.SphereBufferGeometry(35000, 48, 24),
+      new THREE.SphereBufferGeometry(1000, 48, 24),
       this.skyMaterial
     );
     this.attach(this.skyMesh);
 
     // Ambient light
     this.hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.0);
-    this.refreshHemiIntensity();
     this.hemiLight.color.setHSL(0.59, 0.4, 0.6);
     this.hemiLight.groundColor.setHSL(0.095, 0.2, 0.75);
     this.hemiLight.position.set(0, 10, 0);
 
     //Create a PointLight and turn on shadows for the light
-    this.pointLight = new THREE.PointLight(0xffffff, 0.5, 100);
+    this.pointLight = new THREE.PointLight(0xffffff, 1, 50);
     this.pointLight.position.copy(this.hemiLight.position);
     this.pointLight.castShadow = true; // default false
     this.pointLight.color.setHSL(0.59, 0.4, 0.6);
-    this.world.graphicsWorld.graphicsWorld.add(this.pointLight);
 
     //Set up shadow properties for the light
-    this.pointLight.shadow.mapSize.width = 512; // default
-    this.pointLight.shadow.mapSize.height = 512; // default
+    this.pointLight.shadow.mapSize.width = 512 * 2; // default
+    this.pointLight.shadow.mapSize.height = 512 * 2; // default
     this.pointLight.shadow.camera.near = 0.5; // default
     this.pointLight.shadow.camera.far = 500; // default
 
     this.world.graphicsWorld.graphicsWorld.add(this.hemiLight);
-    // this.helper = new THREE.HemisphereLightHelper(this.hemiLight, 5);
-    // this.world.graphicsWorld.graphicsWorld.add(this.helper);
-
+    this.world.graphicsWorld.graphicsWorld.add(this.pointLight);
     this.refreshSunPosition();
+    this.refreshHemiIntensity();
 
     this.world.graphicsWorld.graphicsWorld.add(this);
   }
 
   refreshSunPosition() {
-    const sunDistance = 10;
+    const sunDistance = 40;
 
     this.sunPosition.x =
       sunDistance *
@@ -278,12 +275,13 @@ export class Sky extends THREE.Object3D {
       this.minHemiIntensity +
       Math.pow(1 - Math.abs(this._phi - 90) / 90, 0.25) *
         (this.maxHemiIntensity - this.minHemiIntensity);
+    this.pointLight.intensity = this.hemiLight.intensity * 3;
   }
 
   update(gameTime: GameTime) {
     this.position.copy(this.world.graphicsWorld.camera.position);
     this.refreshSunPosition();
-    // this.helper.update();
+    this.refreshHemiIntensity();
   }
 }
 

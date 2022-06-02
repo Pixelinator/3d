@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 
 export class ResourceManager {
   private resources: Map<string, any>;
@@ -17,8 +18,21 @@ export class ResourceManager {
         loader.load(url, resolve);
       });
       this.addResource(name, p);
+      return p;
     } else if (url.endsWith(".stl")) {
-      return;
+      const loader = new STLLoader();
+      const p = new Promise((resolve) => {
+        loader.load(url, resolve);
+      });
+      this.addResource(name, p);
+      return p;
+    } else if (url.endsWith(".jpg") || url.endsWith(".png")) {
+      const loader = new THREE.TextureLoader();
+      const p = new Promise((resolve) => {
+        loader.load(url, resolve);
+      });
+      this.addResource(name, p);
+      return p;
     }
     return;
   }

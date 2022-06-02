@@ -36,6 +36,7 @@ export class GraphicsWorld {
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // this.renderer.physicallyCorrectLights = true;
     this.camera = new THREE.PerspectiveCamera(
       45,
       innerWidth / innerHeight,
@@ -71,7 +72,6 @@ export class GraphicsWorld {
     //   this.nebula = loaded.addRenderer(nebulaRenderer);
     // });
     this.characterSys = new CharacterSystem(this.parent.inputManager);
-    console.log(this.characterSys);
 
     this.parent.resourceManager.getResource("ybot").then((result: any) => {
       result.scale.setScalar(0.04);
@@ -80,10 +80,25 @@ export class GraphicsWorld {
         c.receiveShadow = true;
       });
       this.character = result;
-      this.character.position.set(0, 1, 0);
+      this.character.position.set(-10, 1, 0);
       this.graphicsWorld.add(this.character);
       this.characterHelper = new THREE.SkeletonHelper(this.character);
       this.graphicsWorld.add(this.characterHelper);
+    });
+
+    this.parent.resourceManager.getResource("sundial").then((result: any) => {
+      const mesh = new THREE.Mesh(
+        result,
+        new THREE.MeshStandardMaterial({ color: 0x222222 })
+      );
+      mesh.rotateX(-Math.PI / 2);
+      mesh.position.set(0, 1, 0);
+      mesh.scale.setScalar(0.05);
+      mesh.traverse((c: any) => {
+        c.castShadow = true;
+        c.receiveShadow = true;
+      });
+      this.graphicsWorld.add(mesh);
     });
   }
 

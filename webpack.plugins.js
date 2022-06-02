@@ -11,6 +11,10 @@ module.exports = [
         from: path.resolve(__dirname, "src", "models"),
         to: path.resolve(__dirname, ".webpack/renderer", "models"),
       },
+      {
+        from: path.resolve(__dirname, "src", "textures"),
+        to: path.resolve(__dirname, ".webpack/renderer", "textures"),
+      },
     ],
   }),
 ];
