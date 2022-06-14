@@ -75,7 +75,7 @@ export class PhysicsWorld {
       new THREE.BoxGeometry(4, 4, 4),
       new THREE.MeshStandardMaterial({ color: 0x808080 })
     );
-    box.position.set(1 * 10, Math.random() * 5 + 40, 1 * 10);
+    box.position.set(10, 40, 10);
     box.castShadow = true;
     box.receiveShadow = true;
     this.parent.graphicsWorld.graphicsWorld.add(box);
@@ -131,7 +131,7 @@ export class PhysicsWorld {
         const contactPoint = contactManifold.getContactPoint(j);
         const distance = contactPoint.getDistance();
         if (distance > 0.0) continue;
-        console.log("Collision detected!");
+        // console.log("Collision detected!");
       }
     }
   }

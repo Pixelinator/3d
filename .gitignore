@@ -87,3 +87,8 @@ typings/
 
 # Electron-Forge
 out/
+
+# Project related
+src/models
+src/textures
+src/sounds

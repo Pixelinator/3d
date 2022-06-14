@@ -17,7 +17,7 @@ export class ThirdPersonCamera extends Component {
   }
 
   calculateIdealOffset() {
-    const idealOffset = new THREE.Vector3(-0, 10, -15);
+    const idealOffset = new THREE.Vector3(0, 10, -15);
     idealOffset.applyQuaternion(this.target.rotation);
     idealOffset.add(this.target.position);
     return idealOffset;
@@ -33,9 +33,6 @@ export class ThirdPersonCamera extends Component {
   update(timeElapsed: number) {
     const idealOffset = this.calculateIdealOffset();
     const idealLookat = this.calculateIdealLookat();
-
-    // const t = 0.05;
-    // const t = 4.0 * timeElapsed;
     const t = 1.0 - Math.pow(0.01, timeElapsed);
 
     this.currentPosition.lerp(idealOffset, t);
@@ -43,6 +40,5 @@ export class ThirdPersonCamera extends Component {
 
     this.camera.position.copy(this.currentPosition);
     this.camera.lookAt(this.currentLookat);
-    // super.update(timeElapsed);
   }
 }

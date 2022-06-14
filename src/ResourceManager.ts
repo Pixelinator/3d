@@ -33,6 +33,13 @@ export class ResourceManager {
       });
       this.addResource(name, p);
       return p;
+    } else if (url.endsWith(".mp3") || url.endsWith(".ogg")) {
+      const loader = new THREE.AudioLoader();
+      const p = new Promise((resolve) => {
+        loader.load(url, resolve);
+      });
+      this.addResource(name, p);
+      return p;
     }
     return;
   }

@@ -1,6 +1,6 @@
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const assets = ["models"];
+// const assets = ["models"];
 const path = require("path");
 
 module.exports = [
@@ -14,6 +14,10 @@ module.exports = [
       {
         from: path.resolve(__dirname, "src", "textures"),
         to: path.resolve(__dirname, ".webpack/renderer", "textures"),
+      },
+      {
+        from: path.resolve(__dirname, "src", "sounds"),
+        to: path.resolve(__dirname, ".webpack/renderer", "sounds"),
       },
     ],
   }),

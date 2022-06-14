@@ -11,6 +11,8 @@ import Stats from "three/examples/jsm/libs/stats.module";
 import { GameTime } from "./GameTime";
 import { GUI } from "dat.gui";
 import { Sky } from "./Sky";
+import { AudioListenerComponent } from "./AudioListenerComponent";
+import CharacterSystem from "./CharacterSystem";
 
 export class World {
   public graphicsWorld: GraphicsWorld;
@@ -30,7 +32,7 @@ export class World {
   public justRendered: boolean;
   public timeScaleTarget = 1;
   public mat: THREE.MeshStandardMaterial;
-  private lastScenarioID: string;
+  // private lastScenarioID: string;
 
   constructor() {
     this.resourceManager = new ResourceManager();
@@ -52,10 +54,24 @@ export class World {
       //   "/textures/pbr/forest-1K/1K-forest_height.jpg",
       //   "/textures/pbr/forest-1K/1K-forest_ao.jpg"
       // ),
+      this.resourceManager.loadResource(
+        "ambient",
+        "/sounds/08 - IntoTheGreen.mp3"
+      ),
+      this.resourceManager.loadResource("idle", "/models/idle.fbx"),
+      this.resourceManager.loadResource("walking", "/models/walking.fbx"),
+      this.resourceManager.loadResource(
+        "left turn 90",
+        "/models/left turn 90.fbx"
+      ),
+      this.resourceManager.loadResource(
+        "right turn 90",
+        "/models/right turn 90.fbx"
+      ),
     ])
       .then((result) => {
         this.mat = result[2] as THREE.MeshStandardMaterial;
-        console.log(this.mat);
+        // console.log(this.mat);
 
         this.gameTime = new GameTime();
         this.clock = new THREE.Clock();
@@ -79,7 +95,9 @@ export class World {
 
         const player = new Entity();
         player.position.set(0, 0, 0);
+        player.addComponent(new CharacterSystem(this.inputManager));
         this.entityManager.add(player, "player");
+
         const camera = new Entity();
         camera.addComponent(
           new ThirdPersonCamera(
@@ -87,9 +105,18 @@ export class World {
             this.entityManager.get("player")
           )
         );
-
+        camera.addComponent(
+          new AudioListenerComponent(this.graphicsWorld.camera)
+        );
         this.entityManager.add(camera, "player-camera");
-        console.log(this.entityManager);
+
+        const sound = new THREE.Audio(
+          camera.components.AudioListenerComponent.listener
+        );
+        sound.setBuffer(result[3] as AudioBuffer);
+        sound.setLoop(true);
+        sound.setVolume(0.01);
+        sound.play();
 
         document.body.appendChild(this.stats.dom);
         window.addEventListener("resize", this.resize.bind(this), false);
